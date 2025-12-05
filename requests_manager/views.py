@@ -49,6 +49,10 @@ def get_requests(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_request(request, pk):
+    obj = Request.objects.prefetch_related("request_comments").get(pk=pk)
+    if request.user.role == "USER":
+        if obj.user != request.user:
+            return HttpResponse("Forbidden", status=status.HTTP_403_FORBIDDEN)
     return render(request, 'get.html', {
         'request': Request.objects.prefetch_related("request_comments").get(pk=pk),
         'form': RequestCommentForm()
@@ -58,6 +62,9 @@ def get_request(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_request_comment_form(request, id):
+    if request.user.role == "USER":
+        return HttpResponse("Forbidden", status=status.HTTP_403_FORBIDDEN)
+    
     if request.method != 'POST':          
         return render(request, 'create_request_comment.html', {'form': RequestCommentForm()})
     
@@ -77,6 +84,9 @@ def create_request_comment_form(request, id):
 def api_request(request, pk):
     match request.method:
         case "PATCH":
+            if request.user.role == "USER":    
+                return HttpResponse("Forbidden", status=status.HTTP_403_FORBIDDEN)
+            
             instance = Request.objects.get(pk=pk)
             serializer = RequestPatchSerializer(instance, data=request.data, partial=True)
             if serializer.is_valid():
@@ -84,5 +94,8 @@ def api_request(request, pk):
             
             return Response(instance.id, status=status.HTTP_200_OK)
         case "DELETE":
+            if request.user.role != "ADMIN":
+                return HttpResponse("Forbidden", status=status.HTTP_403_FORBIDDEN)
+            
             Request.objects.get(pk=pk).delete()
             return Response("Deleted")
