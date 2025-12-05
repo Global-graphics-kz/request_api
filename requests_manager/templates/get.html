@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Заявка №{{ request.id }}</title>
+</head>
+<body>
+    <p>Пользователь {{request.user}}</p>
+    <p>Статус {{request.status}}</p>
+    <p>Приоритет {{request.priority}}</p>
+    <p>Файл {{request.file.url}}</p>
+    <p>{{request.start_date}} - {{request.end_date}}</p>
+    <table>
+        {% for comment in request.request_comments.all %}
+         <tr>
+            <td>{{ comment.user }}:</td>
+            <td>{{ comment.content }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <form method="post" onsubmit="post_comment(event)">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+    <script>
+        function post_comment(event) {
+            event.preventDefault();
+            fetch('comments', {
+              method: 'POST',
+              body: new FormData(event.target)
+            })
+            .then(response => response.json())
+            .then(data => window.location.reload())
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>

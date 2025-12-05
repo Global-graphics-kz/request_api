@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Page</title>
+</head>
+<body>
+    <table>
+        {% for request in requests %}
+         <tr onclick="window.location.href='{{ request.id }}/'">
+            <td>{{ request.id }}</td>
+            <td>{{ request.user }}</td>
+            <td>{{ request.status }}</td>
+            <td>{{ request.priority }}</td>
+            <td>{{ request.start_date }}-{{ request.end_date }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
