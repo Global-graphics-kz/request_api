@@ -6,6 +6,11 @@ class RequestForm(forms.ModelForm):
         model = Request
         fields = ["user", "status", "priority", "file"]
 
+class UserRequestForm(forms.ModelForm):
+    class Meta:
+        model = Request
+        fields = ["file"]
+
 class RequestCommentForm(forms.ModelForm):
     class Meta:
         model = RequestComment
